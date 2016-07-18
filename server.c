@@ -656,7 +656,7 @@ bool parse(const char* line, char* abs_path, char* query)
     char* absolutePath = malloc (strlen(line) * sizeof(char));
     if (absolutePath == NULL)
     {
-        error(500);
+        error(404);
         return false;
     }
     
@@ -667,7 +667,7 @@ bool parse(const char* line, char* abs_path, char* query)
     char* httpString = malloc (11 * sizeof(char));
     if (httpString == NULL)
     {
-        error(500);
+        error(501);
         return false;
     }
     
@@ -708,7 +708,7 @@ bool parse(const char* line, char* abs_path, char* query)
         else
             break;
     }
-
+    /*
     // check if the file extension is valid
     if (lookup (abs_path) == NULL)
     {
@@ -716,7 +716,6 @@ bool parse(const char* line, char* abs_path, char* query)
         return false;
     }
     
-    printf("%s", abs_path);
     // check if the file exists
     if (access (abs_path, F_OK) == -1)
     {
@@ -738,7 +737,8 @@ bool parse(const char* line, char* abs_path, char* query)
         rawQuery = strstr (absolutePath, "?");
     }
     else
-        query == "";
+        query = "";
+        
     // read query from ? to the next space
     short index = 0;
     char *finalQuery = malloc(sizeof(rawQuery));
@@ -763,12 +763,8 @@ bool parse(const char* line, char* abs_path, char* query)
         }
     }
     
-    
-    
-    error(501);
-    return false;
-
-    
+    */
+    return true;
 }
 
 /**
@@ -1081,7 +1077,6 @@ void stop(void)
  */
 void transfer(const char* path, const char* type)
 {
-    printf("%s\n", path);
     // ensure path is readable
     if (access(path, R_OK) == -1)
     {
