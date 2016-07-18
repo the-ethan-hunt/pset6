@@ -716,10 +716,11 @@ bool parse(const char* line, char* abs_path, char* query)
         return false;
     }
     
+    printf("%s", abs_path);
     // check if the file exists
     if (access (abs_path, F_OK) == -1)
     {
-        error(44)
+        error(44);
         return false;
     }
     
@@ -736,17 +737,27 @@ bool parse(const char* line, char* abs_path, char* query)
     {
         rawQuery = strstr (absolutePath, "?");
     }
+    // read query from ? to the next space
+    short index = 0;
+    char *finalQuery = malloc(sizeof(rawQuery));
     
+    while (rawQuery[index] != ' ')
+    {
+        finalQuery[index] = rawQuery[index];
+    }
     // if it is only a ? then return "" else return everything after it
-    if (strlen(rawQuery) == 1)
+    short count = 0;
+    
+    if (strlen(finalQuery) == 1)
     {
         query = "";
     }
     else
     {
-        for (short i = 1; i <= strlen(rawQuery); i++)
+        while (finalQuery[count] != ' ')
         {
-            query[i-1] = rawQuery[i];
+            query[count] = finalQuery[count];
+            count++;
         }
     }
     
