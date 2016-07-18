@@ -737,6 +737,8 @@ bool parse(const char* line, char* abs_path, char* query)
     {
         rawQuery = strstr (absolutePath, "?");
     }
+    else
+        query == "";
     // read query from ? to the next space
     short index = 0;
     char *finalQuery = malloc(sizeof(rawQuery));
