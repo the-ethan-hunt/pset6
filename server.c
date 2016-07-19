@@ -708,20 +708,6 @@ bool parse(const char* line, char* abs_path, char* query)
         else
             break;
     }
-    /*
-    // check if the file extension is valid
-    if (lookup (abs_path) == NULL)
-    {
-        error(501);
-        return false;
-    }
-    
-    // check if the file exists
-    if (access (abs_path, F_OK) == -1)
-    {
-        error(44);
-        return false;
-    }
     
     // allocate memory for the pointer and test if it was
     char* rawQuery = malloc (strlen(line) * sizeof(char));
@@ -734,36 +720,26 @@ bool parse(const char* line, char* abs_path, char* query)
     // If there is a ? then substring it
     if (strchr (absolutePath, '?') != NULL)
     {
+        // if it is only a ? then return "" else return everything after it
         rawQuery = strstr (absolutePath, "?");
+        short index = 1;
+        
+        while (rawQuery[index] != ' ')
+        {
+            query[index-1] = rawQuery[index];
+            index++;
+        }
+        
+        if (strlen(query) == 0)
+        {
+            query = "";
+        }
     }
     else
         query = "";
         
     // read query from ? to the next space
-    short index = 0;
-    char *finalQuery = malloc(sizeof(rawQuery));
     
-    while (rawQuery[index] != ' ')
-    {
-        finalQuery[index] = rawQuery[index];
-    }
-    // if it is only a ? then return "" else return everything after it
-    short count = 0;
-    
-    if (strlen(finalQuery) == 1)
-    {
-        query = "";
-    }
-    else
-    {
-        while (finalQuery[count] != ' ')
-        {
-            query[count] = finalQuery[count];
-            count++;
-        }
-    }
-    
-    */
     return true;
 }
 
