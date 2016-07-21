@@ -609,8 +609,40 @@ void list(const char* path)
  */
 bool load(FILE* file, BYTE** content, size_t* length)
 {
-    // TODO
-    return false;
+    // zero-out the pointers values
+    *content = NULL;
+    *length = 0;
+    
+    // local storage variables
+    int partial_length;
+    int count = 0;
+    
+    // loop thru file counting the number of char read
+    while (true)
+    {
+        partial_length = fgetc(file);
+        if (partial_length == EOF)
+            break;
+        count++;
+    }
+    
+    // reposition seek at the begginning of file
+    rewind(file);
+    
+    *length = count;
+    
+    // allocat memory to content of size previously calculated
+    *content = malloc (*length);
+    
+    //read the full length of file and store ins content 
+    fread(*content, *length, 1, file);
+    
+    if (*content == NULL)
+    {
+        *length = 0;
+    }
+        
+    return true;
 }
 
 /**
