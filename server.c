@@ -228,7 +228,7 @@ int main(int argc, char* argv[])
                         // use path/index.php or path/index.html, if present, instead of directory's path
                         char* index = indexes(path);
                         if (index != NULL)
-                       {
+                        {
                             free(path);
                             path = index;
                         }
@@ -444,8 +444,50 @@ char* htmlspecialchars(const char* s)
  */
 char* indexes(const char* path)
 {
-    // TODO
-    return NULL;
+    // create a pointer to char for the full path
+    int lenght_path_php = strlen(path) + strlen("index.php") + 1;
+    int length_path_html = strlen(path) + strlen("index.html") + 1;
+    
+    
+    char *full_path_php = malloc(sizeof(char) * (lenght_path_php + 1));
+    char *full_path_html = malloc(sizeof(char) * (length_path_html + 1));
+    
+    
+    
+    
+    char *php = "index.php";
+    char *html = "index.html";
+    
+    // concatenate the path with index.php
+    strcpy (full_path_php, path);
+    strcat (full_path_php, php);
+    full_path_php[strlen(full_path_php)] = '\0';
+    
+    // concatenate the path with index.html
+    strcpy (full_path_html, path);
+    strcat (full_path_html, html);
+    full_path_html[strlen(full_path_html)] = '\0';
+    
+    
+    // test if path with php is readble with access()
+    if (access(full_path_php, F_OK) == 0)
+    {
+        free(full_path_html);
+        return full_path_php;
+    }
+    // test if path with html is readble with access()
+    else if (access(full_path_html, F_OK) == 0)
+    {
+        free(full_path_php);
+        return full_path_html;
+    }
+    else
+    {
+        free(full_path_php);
+        free(full_path_html);
+        return NULL;
+    }
+    
 }
 
 /**
@@ -609,40 +651,78 @@ void list(const char* path)
  */
 bool load(FILE* file, BYTE** content, size_t* length)
 {
+    
     // zero-out the pointers values
     *content = NULL;
     *length = 0;
+    BYTE *buffer = NULL;
+    BYTE *temp = NULL;
+ 
+    int count = 1;
     
-    // local storage variables
-    int partial_length;
-    int count = 0;
-    
-    // loop thru file counting the number of char read
-    while (true)
-    {
-        partial_length = fgetc(file);
-        if (partial_length == EOF)
-            break;
-        count++;
-    }
-    
-    // reposition seek at the begginning of file
-    rewind(file);
-    
-    *length = count;
-    
-    // allocat memory to content of size previously calculated
-    *content = malloc (*length);
-    
-    //read the full length of file and store ins content 
-    fread(*content, *length, 1, file);
-    
+    //allocat memory to pointers
+    *content = malloc (2);
     if (*content == NULL)
-    {
-        *length = 0;
-    }
+        {
+            error(500);
+            return false;
+        }
         
+    temp = malloc(2);
+    if (temp == NULL)
+        {
+            error(500);
+            free(*content);
+            return false;
+        }
+        
+    buffer = malloc(2);
+    if (buffer == NULL)
+        {
+            error(500);
+            free(*content);
+            free(temp);
+            return false;
+        }
+
+    
+    while (fread(buffer, 1, 1, file) != 0)
+    {
+        // check successfull reading
+        if (buffer == NULL)
+        {
+            error(500);
+            free(*content);
+            free(temp);
+            free(buffer);
+            return false;
+        }
+        
+        // copy buffer to temporary storage of string
+        memcpy(temp, buffer, 1);
+        
+        // concatenate all the chars from fread
+        strcat (*content, temp);
+        // allocat enough memory to all char read until now, plus the next and the '\0'
+        *content = realloc (*content, count + 3);
+        if (*content == NULL)
+        {
+            error(500);
+            free(temp);
+            free(buffer);
+            *length = 0;
+            return false;
+        }
+        
+        // calculate the length of file
+        count++;
+        
+    }
+    *length = count - 1;
+    free(temp);
+    free(buffer);
     return true;
+    
 }
 
 /**
@@ -704,13 +784,13 @@ bool parse(const char* line, char* abs_path, char* query)
     }
     
     // truncate the previous truncated line to get the HTTP version
-    httpString = strrchr (absolutePath, ' ');
+    httpString = strchr (absolutePath + 1, ' ');
     
     // check if there is a quote mark in the request-line
     if (strstr (absolutePath, "\"") != NULL)
     {
-            error (400);
-            return false;
+        error (400);
+        return false;
     }
     
     // check if ther is a slash at the beguinning of request-path
@@ -735,7 +815,7 @@ bool parse(const char* line, char* abs_path, char* query)
     {
         if (absolutePath[i] != '?' && absolutePath[i] != ' ')
         {
-            abs_path[i-1] = absolutePath[i];
+            abs_path[i - 1] = absolutePath[i];
         }
         else
             break;
@@ -758,7 +838,7 @@ bool parse(const char* line, char* abs_path, char* query)
         
         while (rawQuery[index] != ' ')
         {
-            query[index-1] = rawQuery[index];
+            query[index - 1] = rawQuery[index];
             index++;
         }
         
