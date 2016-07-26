@@ -704,7 +704,7 @@ bool load(FILE* file, BYTE** content, size_t* length)
         // concatenate all the chars from fread
         strcat (*content, temp);
         // allocat enough memory to all char read until now, plus the next and the '\0'
-        *content = realloc (*content, count + 3);
+        *content = realloc (*content, count + 2);
         if (*content == NULL)
         {
             error(500);
