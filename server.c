@@ -655,18 +655,9 @@ bool load(FILE* file, BYTE** content, size_t* length)
     // zero-out the pointers values
     *content = NULL;
     *length = 0;
-    BYTE *buffer = NULL;
+    BYTE buffer[1];
  
     int count = 0;
-    
-    buffer = malloc(1);
-    if (buffer == NULL)
-        {
-            error(500);
-            free(*content);
-            return false;
-        }
-
     
     while (fread(buffer, 1, 1, file) != 0)
     {
@@ -674,20 +665,16 @@ bool load(FILE* file, BYTE** content, size_t* length)
         if (buffer == NULL)
         {
             error(500);
-            free(*content);
-            free(buffer);
             return false;
         }
         
-        // calculate the length of file
-        
-        int sizecount = count + 1;
+        // calculate size of realloc 
+        int sizecount = count + 2;
         
         *content = realloc (*content, sizecount);
-        if (buffer == NULL)
+        if (*content == NULL)
         {
             error(500);
-            free(buffer);
             *length = 0;
             return false;
         }
