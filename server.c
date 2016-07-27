@@ -656,32 +656,14 @@ bool load(FILE* file, BYTE** content, size_t* length)
     *content = NULL;
     *length = 0;
     BYTE *buffer = NULL;
-    BYTE *temp = NULL;
  
-    int count = 1;
+    int count = 0;
     
-    //allocat memory to pointers
-    *content = malloc (2);
-    if (*content == NULL)
-        {
-            error(500);
-            return false;
-        }
-        
-    temp = malloc(2);
-    if (temp == NULL)
-        {
-            error(500);
-            free(*content);
-            return false;
-        }
-        
-    buffer = malloc(2);
+    buffer = malloc(1);
     if (buffer == NULL)
         {
             error(500);
             free(*content);
-            free(temp);
             return false;
         }
 
@@ -693,33 +675,30 @@ bool load(FILE* file, BYTE** content, size_t* length)
         {
             error(500);
             free(*content);
-            free(temp);
             free(buffer);
             return false;
         }
         
-        // copy buffer to temporary storage of string
-        memcpy(temp, buffer, 1);
+        // calculate the length of file
         
-        // concatenate all the chars from fread
-        strcat (*content, temp);
-        // allocat enough memory to all char read until now, plus the next and the '\0'
-        *content = realloc (*content, count + 2);
-        if (*content == NULL)
+        int sizecount = count + 1;
+        
+        *content = realloc (*content, sizecount);
+        if (buffer == NULL)
         {
             error(500);
-            free(temp);
             free(buffer);
             *length = 0;
             return false;
         }
         
-        // calculate the length of file
-        count++;
+        memcpy(*content + count, buffer, 1);
         
+        count++;
     }
+    
+   
     *length = count - 1;
-    free(temp);
     free(buffer);
     return true;
     
