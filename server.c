@@ -661,15 +661,8 @@ bool load(FILE* file, BYTE** content, size_t* length)
     
     while (fread(buffer, 1, 1, file) != 0)
     {
-        // check successfull reading
-        if (buffer == NULL)
-        {
-            error(500);
-            return false;
-        }
-        
         // calculate size of realloc 
-        int sizecount = count + 2;
+        int sizecount = (count + 2) * 8;
         
         *content = realloc (*content, sizecount);
         if (*content == NULL)
@@ -686,7 +679,6 @@ bool load(FILE* file, BYTE** content, size_t* length)
     
    
     *length = count - 1;
-    free(buffer);
     return true;
     
 }
@@ -774,6 +766,14 @@ bool parse(const char* line, char* abs_path, char* query)
     {
         error(505);
         return false;
+    }
+    
+  // int str = strlen(abs_path);
+    //printf("%d", str);
+    
+    for( short j = 0; j < LimitRequestLine + 1 ; j++)
+    {
+        abs_path[j] = 0;
     }
     
     // seprarate path from query in the request
